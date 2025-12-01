@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Welcome | Catering System{% endblock %}
+
+{% block content %}
+
+<div class="text-center mb-5">
+    <h2 class="fw-bold">Catering Event Management System</h2>
+    <p class="text-muted">Please choose a login option to continue</p>
+</div>
+
+<div class="row justify-content-center">
+
+    <!-- Staff Login Card -->
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h4 class="fw-semibold">Staff Login</h4>
+                <p class="text-muted">Login with your Staff ID & Password</p>
+                <a href="{% url 'staff_login' %}" class="btn btn-dark w-100">Login as Staff</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Catering Boy Login Card -->
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h4 class="fw-semibold">Catering Boy Login</h4>
+                <p class="text-muted">Login with your Boy ID & Username</p>
+                <a href="{% url 'boy_login' %}" class="btn btn-primary w-100">Login as Catering Boy</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

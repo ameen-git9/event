@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Catering Boys{% endblock %}
+
+{% block content %}
+
+<h3 class="fw-bold mb-4">Catering Boys List</h3>
+
+<div class="card shadow p-3">
+    <table class="table table-bordered table-striped text-center align-middle mb-0">
+        <thead class="table-dark">
+            <tr>
+                <th>Profile</th>
+                <th>Boy ID</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for boy in boys %}
+            <tr>
+
+                <!-- Profile Picture -->
+                <td>
+                    {% if boy.profile_pic %}
+                        <img src="{{ boy.profile_pic.url }}" width="50" height="50"
+                             class="rounded-circle border">
+                    {% else %}
+                        <div class="rounded-circle bg-secondary d-inline-flex justify-content-center align-items-center"
+                             style="width:50px; height:50px;">
+                            <span class="text-white fw-bold">
+                                {{ boy.username|first|upper }}
+                            </span>
+                        </div>
+                    {% endif %}
+                </td>
+
+                <td>{{ boy.boy_id }}</td>
+                <td>{{ boy.username }}</td>
+
+                <td>
+                    {% if boy.first_time_login %}
+                        <span class="badge bg-warning">Password Not Set</span>
+                    {% else %}
+                        <span class="badge bg-success">Active</span>
+                    {% endif %}
+                </td>
+
+                <td class="d-flex justify-content-center gap-2">
+
+                    <!-- View Profile (STAFF VIEW) -->
+                    <a href="{% url 'staff_boy_profile' boy.id %}" class="btn btn-dark btn-sm">
+                        View Profile
+                    </a>
+
+                    <!-- Edit Boy -->
+                    <a href="{% url 'edit_boy' boy.id %}" class="btn btn-warning btn-sm">
+                        Edit
+                    </a>
+
+                </td>
+
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-muted">No catering boys added yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+
+{% endblock %}

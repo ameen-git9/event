@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+
+    <!-- Left Column -->
+    <div class="col-md-8">
+
+        <div class="card shadow p-4 mb-4">
+
+            {% if event.image %}
+            <img src="{{ event.image.url }}" class="img-fluid rounded mb-3" style="max-height:300px; object-fit:cover;"
+                alt="Event Image">
+            {% else %}
+            <img src="{% static 'images/default_event.png' %}" class="img-fluid rounded mb-3"
+                style="max-height:300px; object-fit:cover;" alt="Default Event">
+            {% endif %}
+
+
+            <h3 class="fw-bold">{{ event.title }}</h3>
+
+            <p class="text-muted">{{ event.date }} | {{ event.location }}</p>
+
+            <p>{{ event.description }}</p>
+
+            <p><strong>Payment per Boy:</strong> ₹{{ event.payment_per_boy }}</p>
+            <p><strong>Total Seats:</strong> {{ event.total_seats }}</p>
+            <p><strong>Available:</strong> {{ available_seats }}</p>
+
+
+            <!-- Boy Registration Button -->
+            {% if request.user.is_boy_user %}
+            {% if user_registered %}
+            <div class="alert alert-success mt-3">
+                You are registered. Seat Number:
+                <strong>{{ user_registered.seat_number }}</strong>
+            </div>
+            {% else %}
+            <a href="{% url 'register_event' event.pk %}" class="btn btn-primary">
+                Register for this Event
+            </a>
+            {% endif %}
+            {% endif %}
+
+
+            <!-- Staff Action Buttons -->
+            {% if request.user.is_staff_user %}
+            <div class="d-flex gap-2 mt-3">
+
+                <!-- Mark Completed -->
+                <form method="post" action="{% url 'event_detail' event.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="mark_completed">
+                    <button type="submit" class="btn btn-success">Mark Completed</button>
+                </form>
+
+                <!-- Simulate Pay All -->
+                <form method="post" action="{% url 'event_detail' event.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="simulate_pay_all">
+                    <button type="submit" class="btn btn-warning">Simulate Pay All</button>
+                </form>
+
+                <a href="{% url 'edit_event' event.pk %}" class="btn btn-outline-warning">Edit</a>
+                <a href="{% url 'delete_event' event.pk %}" class="btn btn-danger">Delete</a>
+            </div>
+            {% endif %}
+
+        </div>
+
+
+        <!-- Registrations Table -->
+        <h4 class="fw-bold">Registrations</h4>
+        <table class="table table-bordered text-center">
+            <thead class="table-dark">
+                <tr>
+                    <th>Seat</th>
+                    <th>Boy</th>
+                    <th>Registered At</th>
+                    <th>Payment</th>
+                    {% if request.user.is_staff_user %}
+                    <th>Actions</th>
+                    {% endif %}
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for r in registrations %}
+                <tr>
+                    <td>{{ r.seat_number }}</td>
+
+                    <!-- CLICKABLE BOY NAME FOR STAFF -->
+                    <td>
+                        {% if request.user.is_staff_user %}
+                        <a href="{% url 'staff_boy_profile' r.boy.id %}">
+                            {{ r.boy.username }}
+                        </a>
+                        {% else %}
+                        {{ r.boy.username }}
+                        {% endif %}
+                    </td>
+
+                    <td>{{ r.registration_date }}</td>
+
+                    <td>
+                        {% with payment=r.payment_set.first %}
+                        {% if payment %}
+                        {% if payment.payment_status == "Paid" %}
+                        <span class="badge bg-success">Paid</span>
+                        {% else %}
+                        <span class="badge bg-warning">Pending</span>
+                        {% endif %}
+                        {% endif %}
+                        {% endwith %}
+                    </td>
+
+                    {% if request.user.is_staff_user %}
+                    <td>
+                        <div class="d-flex justify-content-center">
+
+                            {% with payment=r.payment_set.first %}
+                            {% if payment %}
+                            {% if payment.payment_status != "Paid" %}
+                            <form method="post" action="{% url 'create_order' payment.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    Pay via Razorpay
+                                </button>
+                            </form>
+                            {% endif %}
+                            {% endif %}
+                            {% endwith %}
+
+                        </div>
+                    </td>
+                    {% endif %}
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">No registrations yet</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+
+    <!-- Right Column -->
+    <div class="col-md-4">
+        <div class="card shadow p-3">
+            <h5 class="fw-bold mb-3">Quick Actions</h5>
+
+            <div class="d-grid gap-2">
+                <a href="{% url 'view_events' %}" class="btn btn-outline-dark">Back to Events</a>
+
+                {% if request.user.is_staff_user %}
+                <a href="{% url 'payment_history' %}" class="btn btn-secondary">
+                    Payment History
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

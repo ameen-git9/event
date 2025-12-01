@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}All Events{% endblock %}
+
+{% block content %}
+<h3 class="fw-bold mb-4 text-center">All Events</h3>
+<form method="GET" class="row mb-4">
+
+    <!-- Search -->
+    <div class="col-md-4">
+        <input type="text" name="q" value="{{ request.GET.q }}"
+               class="form-control" placeholder="Search events...">
+    </div>
+
+    <!-- Status Filter -->
+    <div class="col-md-3">
+        <select name="status" class="form-select w-100">
+            <option value="all">All</option>
+
+            <option value="upcoming"
+                {% if request.GET.status|default:"" == "upcoming" %}selected{% endif %}
+            >Upcoming</option>
+
+            <option value="completed"
+                {% if request.GET.status|default:"" == "completed" %}selected{% endif %}
+            >Completed</option>
+        </select>
+    </div>
+
+    <!-- Sorting -->
+    <div class="col-md-3">
+        <select name="sort" class="form-select w-100">
+            <option value="date_asc" {% if request.GET.sort|default:"" == "date_asc" %}selected{% endif %}>
+                Date (Oldest First)
+            </option>
+
+            <option value="date_desc" {% if request.GET.sort|default:"" == "date_desc" %}selected{% endif %}>
+                Date (Newest First)
+            </option>
+
+            <option value="title_asc" {% if request.GET.sort|default:"" == "title_asc" %}selected{% endif %}>
+                Title (A → Z)
+            </option>
+
+            <option value="title_desc" {% if request.GET.sort|default:"" == "title_desc" %}selected{% endif %}>
+                Title (Z → A)
+            </option>
+        </select>
+    </div>
+
+    <!-- Submit -->
+    <div class="col-md-2">
+        <button class="btn btn-dark w-100">Apply</button>
+    </div>
+
+</form>
+
+
+
+
+<div class="col-md-10 mx-auto">
+    <table class="table table-bordered table-striped text-center">
+        <thead class="table-dark">
+            <tr>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Total Seats</th>
+                <th>Available</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for ev in events %}
+            <tr>
+                <td>{{ ev.title }}</td>
+                <td>{{ ev.date }}</td>
+                <td>{{ ev.location }}</td>
+
+                <td>
+                    {% if ev.event_status == "upcoming" %}
+                    <span class="badge bg-primary">Upcoming</span>
+                    {% else %}
+                    <span class="badge bg-success">Completed</span>
+                    {% endif %}
+                </td>
+
+                <td>{{ ev.total_seats }}</td>
+                <td>{{ ev.available_seats }}</td>
+
+                <td class="d-flex justify-content-center gap-2">
+                    <a href="{% url 'event_detail' ev.pk %}" class="btn btn-dark btn-sm">View</a>
+
+                    {% if request.user.is_staff_user %}
+                    <a href="{% url 'edit_event' ev.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'delete_event' ev.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                    {% endif %}
+                </td>
+            </tr>
+
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-muted text-center">No events found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center mt-4">
+
+        {% if page_obj.has_previous %}
+        <a href="?{% if request.GET.q %}q={{request.GET.q}}&{% endif %}
+                  {% if request.GET.status %}status={{request.GET.status}}&{% endif %}
+                  {% if request.GET.sort %}sort={{request.GET.sort}}&{% endif %}
+                  page={{ page_obj.previous_page_number }}" class="btn btn-outline-dark mx-2">
+            Previous
+        </a>
+        {% endif %}
+
+        <span class="btn btn-dark disabled mx-2">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+        <a href="?{% if request.GET.q %}q={{request.GET.q}}&{% endif %}
+                  {% if request.GET.status %}status={{request.GET.status}}&{% endif %}
+                  {% if request.GET.sort %}sort={{request.GET.sort}}&{% endif %}
+                  page={{ page_obj.next_page_number }}" class="btn btn-outline-dark mx-2">
+            Next
+        </a>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

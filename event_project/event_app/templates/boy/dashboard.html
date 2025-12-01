@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Boy Dashboard{% endblock %}
+
+{% block content %}
+
+<h3 class="fw-bold mb-4 text-center">Welcome, {{ request.user.username }}</h3>
+
+
+
+
+
+
+
+<div class="row">
+
+    <!-- Registrations -->
+    <div class="col-md-7">
+
+        <div class="card shadow p-3 mb-4">
+            <h4 class="fw-bold mb-3">Your Event Registrations</h4>
+
+            <table class="table table-bordered text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Event</th>
+                        <th>Seat</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for r in registrations %}
+                    <tr>
+                        <td>{{ r.event.title }}</td>
+                        <td>{{ r.seat_number }}</td>
+                        <td>{{ r.registration_date }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-muted">No registrations</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- Payments -->
+    <div class="col-md-5">
+        <div class="card shadow p-3 mb-4">
+
+            <h4 class="fw-bold mb-3">Your Payments</h4>
+
+            <table class="table table-bordered text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Event</th>
+                        <th>Status</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for p in payments %}
+                    <tr>
+                        <td>{{ p.registration.event.title }}</td>
+                        <td>
+                            {% if p.payment_status == "Paid" %}
+                                <span class="badge bg-success">Paid</span>
+                            {% else %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td>₹{{ p.amount }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-muted">No payments</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

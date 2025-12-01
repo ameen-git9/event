@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Razorpay Payment{% endblock %}
+
+{% block content %}
+<div class="col-md-6 mx-auto">
+    <div class="card shadow p-4 mt-4">
+        <h4 class="fw-bold text-center mb-3">Pay ₹{{ payment.amount }}</h4>
+
+        <p class="text-muted text-center">
+            Payment for event: <strong>{{ payment.registration.event.title }}</strong>
+        </p>
+
+        <button id="rzp-button" class="btn btn-dark w-100">
+            Proceed to Pay
+        </button>
+
+        <a href="{% url 'payment_history' %}" class="btn btn-secondary w-100 mt-3">
+            Cancel & Go Back
+        </a>
+    </div>
+</div>
+
+<!-- Razorpay Checkout Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+var options = {
+    "key": "{{ key_id }}",
+    "amount": "{{ order.amount }}",
+    "currency": "INR",
+    "name": "Catering Event Management",
+    "description": "Event: {{ payment.registration.event.title }}",
+    "order_id": "{{ order.id }}",  // Razorpay Order ID
+    "handler": function (response){
+
+        // Create form to POST callback data to Django
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = "{% url 'razorpay_callback' %}";
+
+        // CSRF token
+        var csrf = "{{ csrf_token }}";
+
+        form.innerHTML = `
+            <input type="hidden" name="csrfmiddlewaretoken" value="${csrf}">
+            <input type="hidden" name="razorpay_payment_id" value="${response.razorpay_payment_id}">
+            <input type="hidden" name="razorpay_order_id" value="${response.razorpay_order_id}">
+            <input type="hidden" name="razorpay_signature" value="${response.razorpay_signature}">
+        `;
+
+        document.body.appendChild(form);
+        form.submit();
+    },
+    "theme": {
+        "color": "#000000"
+    }
+};
+
+document.getElementById("rzp-button").onclick = function(e){
+    var rzp1 = new Razorpay(options);
+    rzp1.open();
+    e.preventDefault();
+};
+</script>
+{% endblock %}

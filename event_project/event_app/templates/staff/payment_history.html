@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Payment History{% endblock %}
+
+{% block content %}
+<h3 class="fw-bold mb-4">Payments History</h3>
+
+<table class="table table-bordered table-striped text-center">
+    <thead class="table-dark">
+        <tr>
+            <th>Boy</th>
+            <th>Event</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Paid At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for p in payments %}
+        <tr>
+            <td>{{ p.registration.boy.username }}</td>
+            <td>{{ p.registration.event.title }}</td>
+            <td>₹{{ p.amount }}</td>
+
+            <td>
+                {% if p.payment_status == "Paid" %}
+                    <span class="badge bg-success">Paid</span>
+                {% else %}
+                    <span class="badge bg-warning">Pending</span>
+                {% endif %}
+            </td>
+
+            <td>
+                {% if p.paid_at %}
+                    {{ p.paid_at }}
+                {% else %}
+                    <span class="text-muted">---</span>
+                {% endif %}
+            </td>
+
+            <td class="d-flex justify-content-center gap-2">
+
+                {% if p.payment_status != "Paid" %}
+                <!-- Razorpay Button -->
+                <form method="post" action="{% url 'create_order' p.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-primary btn-sm">
+                        Pay via Razorpay
+                    </button>
+                </form>
+
+                <!-- Simulate Button -->
+                <form method="post" action="{% url 'simulate_payment' p.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-warning btn-sm">
+                        Simulate
+                    </button>
+                </form>
+                {% endif %}
+
+            </td>
+        </tr>
+
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center text-muted">No Payments Found</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

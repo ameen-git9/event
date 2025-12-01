@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}Staff Dashboard{% endblock %}
+
+{% block content %}
+
+<h3 class="fw-bold mb-4 text-center">Welcome, {{ staff.username }}</h3>
+
+<!-- Stats Cards -->
+<div class="row text-center mb-4">
+
+    <div class="col-md-3 mb-3">
+        <div class="card shadow p-3">
+            <h5>Total Boys</h5>
+            <h2>{{ total_boys }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card shadow p-3">
+            <h5>Total Events</h5>
+            <h2>{{ total_events }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card shadow p-3">
+            <h5>Upcoming Events</h5>
+            <h2>{{ upcoming_events }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card shadow p-3">
+            <h5>Pending Payments</h5>
+            <h2>{{ pending_payments }}</h2>
+        </div>
+    </div>
+
+</div>
+
+<!-- Quick Actions -->
+<!-- Quick Actions -->
+<div class="row text-center mb-5">
+
+    <div class="col-md-2 mb-3">
+        <a href="{% url 'add_boy' %}" class="btn btn-dark w-100">Add Boy</a>
+    </div>
+
+    <div class="col-md-2 mb-3">
+        <a href="{% url 'view_boys' %}" class="btn btn-primary w-100">View Boys</a>
+    </div>
+
+    <div class="col-md-2 mb-3">
+        <a href="{% url 'create_event' %}" class="btn btn-success w-100">Create Event</a>
+    </div>
+
+    <div class="col-md-2 mb-3">
+        <a href="{% url 'view_events' %}" class="btn btn-secondary w-100">View Events</a>
+    </div>
+
+    <div class="col-md-2 mb-3">
+        <a href="{% url 'payment_history' %}" class="btn btn-warning w-100">Payment History</a>
+    </div>
+
+</div>
+
+
+<!-- Upcoming Events -->
+<h4 class="fw-bold mb-3">Upcoming Events</h4>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Title</th>
+            <th>Date</th>
+            <th>Location</th>
+            <th>Total Seats</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ev in upcoming_events_list %}
+        <tr>
+            <td>
+                <a href="{% url 'event_detail' ev.pk %}">
+                    {{ ev.title }}
+                </a>
+            </td>
+            <td>{{ ev.date }}</td>
+            <td>{{ ev.location }}</td>
+            <td>{{ ev.total_seats }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" class="text-center text-muted">No upcoming events</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

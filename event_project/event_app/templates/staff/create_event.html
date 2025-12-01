@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Create Event{% endblock %}
+
+{% block content %}
+<div class="col-md-7 mx-auto">
+    <div class="card shadow p-4">
+        <h3 class="fw-bold mb-3 text-center">Create Event</h3>
+
+        <form method="POST" enctype="multipart/form-data">
+
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <button classtnt="btn btn-primary w-100 mt-3">Create</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
